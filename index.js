@@ -19,7 +19,7 @@ app.use(express.static(path.join(__dirname, 'public')))
    .listen(PORT, () => console.log(`Listening on ${PORT}`));
 
 function showTimes() {
-  const times = process.env.TIMES || 5;
+  const times = process.env.TIMES || 8;
   let result = '';
   for (let i = 0; i < times; i++) {
     result += i + ' ';
