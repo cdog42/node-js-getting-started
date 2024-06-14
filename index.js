@@ -1,3 +1,4 @@
+require('dotenv').config();
 const cool = require('cool-ascii-faces');
 const express = require('express');
 const path = require('path');
@@ -23,8 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')))
      } catch (err) {
        res.status(500).send('Error fetching data from MongoDB');
      }
-   })
-   .listen(PORT, () => console.log(`Listening on ${PORT}`));
+   });
 
 function showTimes() {
   const times = process.env.TIMES || 5;
@@ -45,7 +45,8 @@ app.post('/admin/add', async (req, res) => {
     await collection.insertOne({ data });
     res.redirect('/admin');
   } catch (err) {
-    res.send('Error adding data');
+    console.error('Error adding data:', err); // Log the error details
+    res.status(500).send('Error adding data');
   }
 });
 
@@ -57,9 +58,12 @@ app.post('/admin/delete', async (req, res) => {
     await collection.deleteOne({ _id: new ObjectId(id) });
     res.redirect('/admin');
   } catch (err) {
-    res.send('Error deleting data');
+    console.error('Error deleting data:', err); // Log the error details
+    res.status(500).send('Error deleting data');
   }
 });
 
 // Connect to MongoDB before starting the server
-connectToDatabase().catch(err => console.error(err));
+connectToDatabase().then(() => {
+  app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+}).catch(err => console.error('Failed to connect to database', err));

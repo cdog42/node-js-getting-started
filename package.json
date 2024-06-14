@@ -8,7 +8,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "node test.js"
+    "test": "node test.js",
+    "dev": "nodemon server.js"
   },
   "dependencies": {
     "cool-ascii-faces": "^1.3.4",
@@ -32,3 +33,8 @@
   ],
   "license": "MIT"
 }
+
+
+
+
+
