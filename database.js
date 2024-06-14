@@ -1,35 +1,32 @@
-// database.js some more comments here
-
-const { MongoClient } = require('mongodb');
-const dotenv = require('dotenv');
-
-dotenv.config();
-
-const client = new MongoClient(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+const { MongoClient, ObjectId } = require('mongodb');
 
 let db;
 
-async function connectToDatabase() {
+const connectToDatabase = async () => {
+  const client = new MongoClient(process.env.DATABASE_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+
   try {
     await client.connect();
-    db = client.db();
     console.log('Connected to MongoDB');
+    db = client.db(process.env.DB_NAME); // Assuming you have DB_NAME set in your environment variables
   } catch (err) {
-    console.error('Failed to connect to MongoDB', err);
+    console.error('Error connecting to MongoDB:', err);
+    throw err;
   }
-}
+};
 
-function getDb() {
+const getDb = () => {
   if (!db) {
-    throw new Error('Database not connected');
+    throw new Error('Database not initialized');
   }
   return db;
-}
+};
 
 module.exports = {
   connectToDatabase,
   getDb,
+  ObjectId // Export ObjectId for use in other files
 };

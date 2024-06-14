@@ -1,7 +1,7 @@
 const cool = require('cool-ascii-faces');
 const express = require('express');
 const path = require('path');
-const { connectToDatabase, getDb } = require('./database'); // Add this line
+const { connectToDatabase, getDb, ObjectId } = require('./database'); // Import database functions and ObjectId
 
 const PORT = process.env.PORT || 5001;
 
@@ -12,8 +12,9 @@ app.use(express.static(path.join(__dirname, 'public')))
    .set('view engine', 'ejs')
    .get('/', (req, res) => res.render('pages/index'))
    .get('/cool', (req, res) => res.send(cool()))
+   .get('/admin', (req, res) => res.render('pages/admin'))
    .get('/times', (req, res) => res.send(showTimes()))
-   .get('/data', async (req, res) => { // Add this route to test MongoDB
+   .get('/data', async (req, res) => {
      try {
        const db = getDb();
        const collection = db.collection('test');
@@ -33,6 +34,32 @@ function showTimes() {
   }
   return result;
 }
+
+app.use(express.urlencoded({ extended: true }));
+
+app.post('/admin/add', async (req, res) => {
+  const data = req.body.data;
+  try {
+    const db = getDb();
+    const collection = db.collection('test');
+    await collection.insertOne({ data });
+    res.redirect('/admin');
+  } catch (err) {
+    res.send('Error adding data');
+  }
+});
+
+app.post('/admin/delete', async (req, res) => {
+  const id = req.body.id;
+  try {
+    const db = getDb();
+    const collection = db.collection('test');
+    await collection.deleteOne({ _id: new ObjectId(id) });
+    res.redirect('/admin');
+  } catch (err) {
+    res.send('Error deleting data');
+  }
+});
 
 // Connect to MongoDB before starting the server
 connectToDatabase().catch(err => console.error(err));
